@@ -4,12 +4,23 @@ import '../cotrollers/loginController.dart';
 import 'home_page.dart';
 import 'signup.dart';
 
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
 
-class LoginScreen extends StatelessWidget {
+class _LoginScreenState extends State<LoginScreen> {
   final LoginController _loginController = LoginController();
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool passwordVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    passwordVisible = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +40,20 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 20.0),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    passwordVisible ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      passwordVisible = !passwordVisible;
+                    });
+                  },
+                ),
+              ),
+              obscureText: !passwordVisible,
             ),
             SizedBox(height: 20.0),
             ElevatedButton(

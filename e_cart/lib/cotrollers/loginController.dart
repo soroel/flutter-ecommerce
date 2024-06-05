@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class LoginController {
-  final String apiUrl = "http://192.168.11.29:8000/login";
+  final String apiUrl = "http://192.168.1.10:8000/login";
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {

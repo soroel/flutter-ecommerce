@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../cotrollers/signup_controller.dart';
-import 'login.dart';
+
 
 
 class SignUpScreen extends StatefulWidget {
