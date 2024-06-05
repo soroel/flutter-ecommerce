@@ -118,9 +118,13 @@ class ProductController extends GetxController {
     return cart.fold(0, (sum, item) => sum + (item['quantity'] as int));
   }
 
-  double getTotalPrice() {
-    return cart.fold(0.0, (sum, item) => sum + ((item['quantity'] as int) * (item['price'] as double)));
+  getTotalPrice() {
+    return cart.fold(0.0, (sum, item) {
+      print("Quantity Type: ${item['quantity'].runtimeType}, Price Type: ${item['price'].runtimeType}");
+      return sum + (item['quantity'] as int) * (item['price']?.toDouble() ?? 0.0);
+    });
   }
+
 
   void removeFromCart(int id) {
     cart.removeWhere((item) => item['id'] == id);

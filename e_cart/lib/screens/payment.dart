@@ -42,57 +42,104 @@ class _PaymentScreenState extends State<PaymentScreen> {
     print("Number: $number, Amount: $amount, Transaction ID: $_trnxId");
 
     if (number.isEmpty || amount <= 0 || _trnxId == null) {
-      // Handle invalid input
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please enter all the details correctly.')));
       return;
     }
 
-    try {
-      final response = await sendPaymentDetails(PaymentDetails(
-        number: number,
-        trnxId: _trnxId!,
-        amount: amount,
-      ));
-      // Handle the response (success or failure)
-      print(response);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response)));
-    } catch (e) {
-      // Handle error
-      print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    // Confirmation dialog
+    final confirm = await showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: Text('Confirm Payment'),
+            content: Text(
+                'Send \$${amount.toStringAsFixed(2)} to account 0794824427?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Confirm'),
+              ),
+            ],
+          ),
+    );
+
+    if (confirm == true) {
+      try {
+        final response = await sendPaymentDetails(PaymentDetails(
+          number: number,
+          trnxId: _trnxId!,
+          amount: amount,
+        ));
+        // Handle the response (success or failure)
+        print(response);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response)));
+      } catch (e) {
+        // Handle error
+        print('Error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')));
+      }
     }
+  }
+
+  void _showPaymentDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Make Payment'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  TextField(
+                    controller: _numberController,
+                    decoration: InputDecoration(labelText: 'Phone Number'),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _submitPayment,
+                    child: Text('Submit Payment'),
+                  ),
+                ],
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Make Payment'),
+        title: Text('Payment'),
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: _numberController,
-              decoration: InputDecoration(labelText: 'Phone Number'),
-            ),
-            TextField(
-              enabled: false,
-              decoration: InputDecoration(labelText: 'Transaction ID', hintText: _trnxId ?? ''),
-            ),
-            TextField(
-              enabled: false,
-              decoration: InputDecoration(labelText: 'Amount', hintText: '\$${productController.getTotalPrice()}'),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _submitPayment,
-              child: Text('Submit Payment'),
-            ),
-          ],
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            _showPaymentDialog(context);
+          },
+          child: Text('Set Up Payment'),
         ),
       ),
     );

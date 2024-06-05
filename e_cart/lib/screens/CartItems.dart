@@ -15,7 +15,69 @@ class CartPage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.payment),
             onPressed: () {
-              Get.to(() => PaymentScreen());
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Make Payment'),
+                    content: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            TextField(
+                              controller: TextEditingController(), // Add your controller here
+                              decoration: InputDecoration(labelText: 'Phone Number'),
+                            ),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Confirm Payment'),
+                                      content: Text('Send \$${productController.getTotalPrice().toStringAsFixed(2)} to account ?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            // Perform payment logic here
+                                            // Close the dialog
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Confirm'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            // Close the dialog
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Cancel'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text('Submit Payment'),
+                            ),
+
+                          ],
+                        );
+                      },
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Close'),
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
         ],
@@ -42,11 +104,10 @@ class CartPage extends StatelessWidget {
                       icon: Icon(Icons.remove),
                       onPressed: () {
                         productController.decreaseQuantity(item);
-                        // Show snackbar
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Item removed from cart'),
-                            duration: Duration(seconds: 2), // Optional duration
+                            duration: Duration(seconds: 2),
                           ),
                         );
                       },
@@ -56,12 +117,11 @@ class CartPage extends StatelessWidget {
                       icon: Icon(Icons.add),
                       onPressed: () {
                         productController.increaseQuantity(item);
-                        // Show snackbar
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                          SnackBar(
                             content: Text('Item added to cart'),
                             duration: Duration(seconds: 2),
-                            ),
+                          ),
                         );
                       },
                     ),
